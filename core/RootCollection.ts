@@ -11,6 +11,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { CollectionBase } from "./CollectionBase";
+import { initAppIfNeeded } from "./initialize";
 import { AddPayload, WhereQuery } from "./types";
 
 export function RootCollection<T>(path: string) {
@@ -34,6 +35,7 @@ export function RootCollection<T>(path: string) {
     }
   }
 
+  initAppIfNeeded();
   const db = getFirestore();
   _Collection.ref = firestoreCollection(db, path);
 
