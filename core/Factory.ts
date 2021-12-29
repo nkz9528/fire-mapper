@@ -1,6 +1,6 @@
-export interface Constructable extends Function {
-  new (...args: any[]);
-}
+import { CollectionBase } from "./CollectionBase";
+
+export type Constructable = typeof CollectionBase;
 
 export class CollectionFactoryRegistry {
   private static registry: { [key: string]: Constructable } = {};

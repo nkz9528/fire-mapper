@@ -1,45 +1,66 @@
 import {
   DocumentData,
   DocumentReference,
-  orderBy,
   OrderByDirection,
-  where,
-  WhereFilterOp,
   collection as firestoreCollection,
+  CollectionReference,
+  addDoc,
 } from "firebase/firestore";
 import { CollectionBase } from "./CollectionBase";
-import { WhereQuery } from "./types";
+import { AddPayload, WhereQuery } from "./types";
 
 export function SubCollection<T>(path: string) {
   abstract class _Collection extends CollectionBase {
-    static async findMany(): Promise<T[]> {
-      return (await this.get()) as any as T[];
-    }
+    private static refs: { [id: string]: CollectionReference<DocumentData> };
 
-    static where(q: WhereQuery<T>) {
-      Object.keys(q).forEach((key) => {
-        const v = q[key as keyof typeof q];
-        if (!v) {
-          return this;
-        }
-        const opVal = Object.entries(v)[0];
-        this.queryConstraints = [
-          ...this.queryConstraints,
-          where(key.toString(), opVal[0] as WhereFilterOp, opVal[1]),
-        ];
-      });
-      return this;
+    static async findMany(id: string): Promise<Partial<T>[]> {
+      const ref = this.refs[id];
+      return (await this.get(ref)) as any as T[];
     }
-    static orderBy(field: keyof T, direction: OrderByDirection) {
-      this.queryConstraints = [
-        ...this.queryConstraints,
-        orderBy(field.toString(), direction),
-      ];
+    static async add(id: string, value: AddPayload<T>) {
+      await addDoc(this.refs[id], value);
     }
     static setRef(db: DocumentReference<DocumentData>) {
-      this.ref = firestoreCollection(db, path);
+      this.refs = {
+        ...this.refs,
+        [db.id]: firestoreCollection(db, path),
+      };
     }
   }
 
   return _Collection;
+}
+
+export function Collection<T extends ReturnType<typeof SubCollection>>(
+  constructor: T
+) {
+  class _SubCollection {
+    private id: string;
+    public _type = "subcollection";
+    private _: T;
+
+    constructor(cons: T) {
+      this._ = cons;
+    }
+    async findMany(): Promise<InstanceType<T>[]> {
+      return this._.findMany(this.id) as any;
+    }
+    where(q: WhereQuery<InstanceType<T>>) {
+      this._._where(q);
+      return this;
+    }
+    orderBy(field: keyof InstanceType<T>, direction: OrderByDirection) {
+      this._._orderBy(field, direction);
+      return this;
+    }
+    add(value: AddPayload<InstanceType<T>>) {
+      this._.add(this.id, value);
+    }
+    setRef(db: DocumentReference<DocumentData>) {
+      this.id = db.id;
+      this._.setRef(db);
+    }
+  }
+
+  return new _SubCollection(constructor);
 }

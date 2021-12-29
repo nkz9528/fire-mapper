@@ -5,37 +5,37 @@ import {
   WhereFilterOp,
   collection as firestoreCollection,
   getFirestore,
+  CollectionReference,
+  DocumentData,
+  addDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { CollectionBase } from "./CollectionBase";
-import { WhereQuery } from "./types";
+import { initAppIfNeeded } from "./initialize";
+import { AddPayload, WhereQuery } from "./types";
 
 export function RootCollection<T>(path: string) {
-  abstract class _Collection extends CollectionBase {
-    static async findMany(): Promise<T[]> {
-      return (await this.get()) as any as T[];
+  class _Collection extends CollectionBase {
+    static ref: CollectionReference<DocumentData>;
+
+    static async findMany(): Promise<Partial<T>[]> {
+      return (await this.get(this.ref)) as any as T[];
     }
     static where(q: WhereQuery<T>) {
-      Object.keys(q).forEach((key) => {
-        const v = q[key as keyof typeof q];
-        if (!v) {
-          return this;
-        }
-        const opVal = Object.entries(v)[0];
-        this.queryConstraints = [
-          ...this.queryConstraints,
-          where(key.toString(), opVal[0] as WhereFilterOp, opVal[1]),
-        ];
-      });
-      return this;
+      return this._where(q);
     }
     static orderBy(field: keyof T, direction: OrderByDirection) {
-      this.queryConstraints = [
-        ...this.queryConstraints,
-        orderBy(field.toString(), direction),
-      ];
-      return this;
+      return this._orderBy(field, direction);
+    }
+    static async add(value: AddPayload<T>) {
+      await addDoc(this.ref, value);
+    }
+    async update(value: AddPayload<T>) {
+      await updateDoc(this.ref, value as any);
     }
   }
+
+  initAppIfNeeded();
   const db = getFirestore();
   _Collection.ref = firestoreCollection(db, path);
 

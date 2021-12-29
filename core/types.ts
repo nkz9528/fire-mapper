@@ -21,3 +21,7 @@ type KeysExcludeRef<E> = Exclude<
   SchemaExcludeRef<E>[keyof SchemaExcludeRef<E>],
   undefined
 >;
+
+export type AddPayload<E> = {
+  [key in KeysExcludeRef<E>]?: E[key];
+};

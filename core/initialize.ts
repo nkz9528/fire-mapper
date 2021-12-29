@@ -1,11 +1,9 @@
 import { getApps, initializeApp } from "firebase/app";
 
-function init() {
+export function initAppIfNeeded() {
   const firebaseConfig = require("../../../firebase-config")["default"];
   if (getApps().length > 0) {
     return;
   }
   initializeApp(firebaseConfig);
 }
-
-export default init;
