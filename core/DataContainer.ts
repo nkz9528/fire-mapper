@@ -1,4 +1,4 @@
-import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
+import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore/lite";
 import { CollectionFactoryRegistry } from "./Factory";
 import { Reference } from "./Reference";
 import { Collection } from "./SubCollection";

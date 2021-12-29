@@ -1,4 +1,8 @@
-import { DocumentData, DocumentReference, getDoc } from "firebase/firestore";
+import {
+  DocumentData,
+  DocumentReference,
+  getDoc,
+} from "firebase/firestore/lite";
 import { RootCollection } from "..";
 import { DataContainer } from "./DataContainer";
 

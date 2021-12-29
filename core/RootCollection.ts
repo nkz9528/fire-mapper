@@ -9,7 +9,7 @@ import {
   DocumentData,
   addDoc,
   updateDoc,
-} from "firebase/firestore";
+} from "firebase/firestore/lite";
 import { CollectionBase } from "./CollectionBase";
 import { initAppIfNeeded } from "./initialize";
 import { AddPayload, WhereQuery } from "./types";

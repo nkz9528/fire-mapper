@@ -1,4 +1,4 @@
-import { WhereFilterOp } from "firebase/firestore";
+import { WhereFilterOp } from "firebase/firestore/lite";
 import { Reference } from "./Reference";
 import { RootCollection } from "./RootCollection";
 import { SubCollection } from "./SubCollection";

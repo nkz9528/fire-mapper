@@ -5,7 +5,7 @@ import {
   collection as firestoreCollection,
   CollectionReference,
   addDoc,
-} from "firebase/firestore";
+} from "firebase/firestore/lite";
 import { CollectionBase } from "./CollectionBase";
 import { AddPayload, WhereQuery } from "./types";
 

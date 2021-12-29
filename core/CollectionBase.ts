@@ -12,7 +12,7 @@ import {
   QueryConstraint,
   where,
   WhereFilterOp,
-} from "firebase/firestore";
+} from "firebase/firestore/lite";
 import { DataContainer } from "./DataContainer";
 
 export class CollectionBase extends DataContainer {
