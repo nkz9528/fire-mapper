@@ -5,6 +5,7 @@ import {
   collection as firestoreCollection,
   CollectionReference,
   addDoc,
+  deleteDoc,
 } from "firebase/firestore/lite";
 import { CollectionBase } from "./CollectionBase";
 import { AddPayload, WhereQuery } from "./types";
@@ -25,6 +26,9 @@ export function SubCollection<T>(path: string) {
         ...this.refs,
         [db.id]: firestoreCollection(db, path),
       };
+    }
+    async delete() {
+      await deleteDoc(this.ref);
     }
   }
 
@@ -53,8 +57,8 @@ export function Collection<T extends ReturnType<typeof SubCollection>>(
       this._._orderBy(field, direction);
       return this;
     }
-    add(value: AddPayload<InstanceType<T>>) {
-      this._.add(this.id, value);
+    async add(value: AddPayload<InstanceType<T>>) {
+      await this._.add(this.id, value);
     }
     setRef(db: DocumentReference<DocumentData>) {
       this.id = db.id;
